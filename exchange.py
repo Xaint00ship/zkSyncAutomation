@@ -1,6 +1,6 @@
 from zksync_sdk.lib import ZkSyncLibrary
 from zksync_sdk.zksync_provider import ZkSyncProviderV01
-from zksync_sdk.network import goerli
+from zksync_sdk.network import goerli, mainnet
 from zksync_sdk.transport.http import HttpJsonRPCTransport
 from zksync_sdk.zksync_signer import ZkSyncSigner
 from web3 import Web3, HTTPProvider, Account
@@ -11,9 +11,7 @@ from zksync_sdk.ethereum_signer import EthereumSignerWeb3
 from decimal import Decimal
 import asyncio
 import os
-from fractions import Fraction
-from decimal import Decimal
-from zksync_sdk.types import RatioType
+from ipfs2bytes32 import Ipfs2bytes32
 
 class WalletFunction:
 
@@ -51,16 +49,16 @@ class WalletFunction:
 
 
 
-    def deposit(self, valueDeposit):
-        token = self.loop.run_until_complete(self.wallet.resolve_token("ETH"))
-        deposit = self.loop.run_until_complete(self.wallet.ethereum_provider.deposit(token, Decimal(valueDeposit), self.account.address))
+    def deposit(self, valueDeposit, token):
+        token = self.loop.run_until_complete(self.wallet.resolve_token(token))
+        deposit = self.loop.run_until_complete(self.wallet.ethereum_provider.deposit(token, Decimal(valueDeposit),  self.account.address))
 
         return deposit
 
 
 
-    def mintingNFT(self, NftHash, recipientAddress, token):
-        tr = self.loop.run_until_complete(self.wallet.mint_nft(NftHash, recipientAddress, token))
+    def mintingNFT(self, cid, recipientAddress, token):
+        infNft = self.loop.run_until_complete(self.wallet.mint_nft(Ipfs2bytes32().byte32_to_ipfscidv0(cid), recipientAddress, token))
 
-        return tr
+        return infNft
 
